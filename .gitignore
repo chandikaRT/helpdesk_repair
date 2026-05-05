@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Playwright E2E test output
+tests/playwright/reports/
+tests/playwright/node_modules/
+tests/playwright/test-results/
+tests/playwright/.cache/
+
+# Claude Code local working directory (tool state — not project content)
+.claude/
+
+# Odoo runtime artefacts
+*.odoo_debug
+.odoo_upgrade/
+web/filestore/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_project_task_form_repair" model="ir.ui.view">
+        <field name="name">project.task.form.repair</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="model">project.task</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+          <data>
+            <!-- Invisible modifier fields on form root -->
+            <xpath expr="//form[1]" position="inside">
+                <field name="x_studio_diagnosis_area_1" invisible="1"/>
+                <field name="x_studio_reason_code" invisible="1"/>
+            </xpath>
+
+            <!-- Buttons after personal_stage_type_id -->
+            <xpath expr="//field[@name='personal_stage_type_id']" position="after">
+                <button type="object" name="action_view_repair_diagnosis_validation"
+                        string="View Repair Diagnosis Validation"
+                        class="btn-primary"
+                        invisible="(x_studio_valid_diagnosis != False) or ((helpdesk_ticket_id == False) or ((x_studio_cancelled == True) or (x_studio_end_quick_repair == True)))"/>
+                <button type="object" name="action_view_repair_image_validation"
+                        string="View Repair Image Validation"
+                        class="btn-primary"
+                        invisible="(x_studio_repair_image_01 != False) or ((helpdesk_ticket_id == False) or ((x_studio_cancelled == True) or (x_studio_end_quick_repair == True)))"/>
+                <button type="object" name="action_tested_ok"
+                        string="Tested OK"
+                        class="btn-primary"
+                        invisible="(helpdesk_ticket_id == False) or ((x_studio_cancelled == True) or ((x_studio_end_quick_repair == True) or (material_line_product_count != 0)))"/>
+            </xpath>
+
+            <!-- Fields after user_ids -->
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='user_ids']"
+                   position="after">
+                <field name="helpdesk_ticket_id" string="Help Desk Ticket"/>
+                <field name="x_studio_created_date"/>
+                <field name="x_studio_repair_reason" invisible="True"/>
+            </xpath>
+
+            <!-- Fields in right group -->
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/div[3]" position="after">
+                <field name="x_studio_priority"/>
+                <field name="x_studio_quotation_type"/>
+                <field name="x_studio_material_availability"/>
+            </xpath>
+
+            <!-- Tabs: Repair Image, Warranty Card, Repair Diagnosis -->
+            <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                <page string="Repair Image" name="studio_page_8ci_1ik1qk8tm">
+                    <group name="studio_group_8ci">
+                        <group name="studio_group_8ci_left">
+                            <field name="x_studio_repair_image_01" widget="tablet_image"/>
+                        </group>
+                        <group name="studio_group_8ci_right">
+                            <field name="x_studio_repair_image_02" widget="tablet_image"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Warranty Card" name="studio_page_8db_1ik1r0ore">
+                    <group name="studio_group_8db">
+                        <group name="studio_group_8db_left">
+                            <field name="x_studio_warranty_card" widget="image"/>
+                        </group>
+                        <group name="studio_group_8db_right">
+                            <field name="x_studio_related_information" widget="image"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Repair Diagnosis" name="studio_page_M5qFQ"
+                      invisible="helpdesk_ticket_id == False">
+                    <field name="x_studio_diagnosis_ids" force_save="True"
+                           required="helpdesk_ticket_id != False">
+                        <tree editable="bottom">
+                            <field name="x_studio_sequence" widget="handle"/>
+                            <field name="x_name" column_invisible="True"/>
+                            <field name="x_studio_condition" optional="show" column_invisible="True"/>
+                            <field name="x_studio_symptom_area" optional="show" column_invisible="True"/>
+                            <field name="x_studio_symptom_code" optional="show" column_invisible="True"/>
+                            <field name="x_studio_description" optional="show"/>
+                            <field name="x_studio_diagnosis_area" optional="show" required="1"/>
+                            <field name="x_studio_diagnosis_code" optional="show" required="1"
+                                   domain="[['x_studio_diagnosis_area_1','=',x_studio_diagnosis_area]]"/>
+                            <field name="x_studio_reason" optional="show" required="1"/>
+                            <field name="x_studio_sub_reason" optional="show" required="1"
+                                   domain="[['x_studio_reason_code','=',x_studio_reason]]"/>
+                            <field name="x_studio_resolution" optional="show" required="1"/>
+                            <field name="x_studio_repair_stage" optional="show" required="1"/>
+                            <field name="x_studio_task_id" optional="show" invisible="1"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+          </data>
+        </field>
+    </record>
+</odoo>

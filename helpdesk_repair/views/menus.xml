@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Window actions for reporting menus -->
+    <record id="action_repair_job_details" model="ir.actions.act_window">
+        <field name="name">Repair Job Details</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">tree,form</field>
+        <field name="limit">80</field>
+    </record>
+
+    <record id="action_repair_sales_order_list" model="ir.actions.act_window">
+        <field name="name">Repair Sales Order List</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="limit">80</field>
+    </record>
+
+    <!-- Top-level Repair Diagnosis menu under Helpdesk -->
+    <menuitem id="menu_helpdesk_repair_diagnosis"
+              name="Repair Diagnosis"
+              parent="helpdesk.menu_helpdesk_root"
+              action="base.action_open_website"
+              sequence="101"/>
+
+    <!-- Sub-menus of Repair Diagnosis -->
+    <menuitem id="menu_symptom_areas"
+              name="Symptom Areas"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_symptom_areas"
+              sequence="1"/>
+
+    <menuitem id="menu_symptom_codes"
+              name="Symptom Codes"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_symptom_codes"
+              sequence="2"/>
+
+    <menuitem id="menu_diagnosis_areas"
+              name="Diagnosis Areas"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_diagnosis_areas"
+              sequence="3"/>
+
+    <menuitem id="menu_diagnosis_codes"
+              name="Diagnosis Codes"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_diagnosis_codes"
+              sequence="4"/>
+
+    <menuitem id="menu_repair_reason"
+              name="Repair Reason"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_repair_reason"
+              sequence="5"/>
+
+    <menuitem id="menu_repair_reason_custom"
+              name="Repair Reason - Customer"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_repair_reason_custom"
+              sequence="6"/>
+
+    <menuitem id="menu_repair_sub_reason"
+              name="Repair Sub Reason"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_repair_sub_reason"
+              sequence="7"/>
+
+    <menuitem id="menu_resolutions"
+              name="Resolutions"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_resolutions"
+              sequence="8"/>
+
+    <menuitem id="menu_repair_stages"
+              name="Repair Stages"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_repair_stages"
+              sequence="9"/>
+
+    <menuitem id="menu_conditions"
+              name="Conditions"
+              parent="menu_helpdesk_repair_diagnosis"
+              action="action_x_conditions"/>
+
+    <!-- Repair Accounts under Helpdesk > Configuration -->
+    <menuitem id="menu_repair_accounts"
+              name="Repair Accounts"
+              parent="helpdesk.helpdesk_menu_config"
+              action="action_x_repair_accounts"
+              sequence="7"/>
+
+    <!-- Reporting sub-menus under Helpdesk > Reporting -->
+    <menuitem id="menu_repair_job_details"
+              name="Repair Job Details"
+              parent="helpdesk.helpdesk_ticket_report_menu_main"
+              action="action_repair_job_details"
+              sequence="3"/>
+
+    <menuitem id="menu_repair_sales_order_list"
+              name="Repair Sales Order List"
+              parent="helpdesk.helpdesk_ticket_report_menu_main"
+              action="action_repair_sales_order_list"
+              sequence="4"/>
+</odoo>
