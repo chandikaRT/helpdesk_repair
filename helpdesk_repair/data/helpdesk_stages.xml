@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="stage_new" model="helpdesk.stage">
+        <field name="name">NEW</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="stage_sent_to_factory" model="helpdesk.stage">
+        <field name="name">SENT TO FACTORY</field>
+        <field name="sequence">2</field>
+    </record>
+
+    <record id="stage_received_at_factory" model="helpdesk.stage">
+        <field name="name">RECEIVED AT FACTORY</field>
+        <field name="sequence">3</field>
+    </record>
+
+    <record id="stage_diagnosis" model="helpdesk.stage">
+        <field name="name">DIAGNOSIS</field>
+        <field name="sequence">4</field>
+    </record>
+
+    <record id="stage_estimation_sent" model="helpdesk.stage">
+        <field name="name">ESTIMATION SENT</field>
+        <field name="sequence">5</field>
+    </record>
+
+    <record id="stage_estimation_approval_received" model="helpdesk.stage">
+        <field name="name">ESTIMATION APPROVAL RECEIVED</field>
+        <field name="sequence">6</field>
+    </record>
+
+    <record id="stage_advance_received" model="helpdesk.stage">
+        <field name="name">ADVANCE RECEIVED</field>
+        <field name="sequence">7</field>
+    </record>
+
+    <record id="stage_repair_started" model="helpdesk.stage">
+        <field name="name">REPAIR STARTED</field>
+        <field name="sequence">8</field>
+    </record>
+
+    <record id="stage_repair_completed" model="helpdesk.stage">
+        <field name="name">REPAIR COMPLETED</field>
+        <field name="sequence">9</field>
+    </record>
+
+    <record id="stage_sent_to_sales_centre" model="helpdesk.stage">
+        <field name="name">SENT TO SALES CENTRE</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="stage_received_at_sales_centre" model="helpdesk.stage">
+        <field name="name">RECEIVED AT SALES CENTRE</field>
+        <field name="sequence">11</field>
+    </record>
+
+    <record id="stage_handed_over_to_customer" model="helpdesk.stage">
+        <field name="name">HANDED OVER TO CUSTOMER</field>
+        <field name="sequence">12</field>
+    </record>
+
+    <record id="stage_cancelled" model="helpdesk.stage">
+        <field name="name">CANCELLED</field>
+        <field name="sequence">13</field>
+    </record>
+
+</odoo>
