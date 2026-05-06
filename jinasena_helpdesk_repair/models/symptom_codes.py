@@ -5,6 +5,7 @@ class SymptomCodes(models.Model):
     _name = 'x_symptom_codes'
     _description = 'Symptom Codes'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _rec_name = 'x_name'
     _order = 'x_studio_sequence, id'
 
     x_name = fields.Char(string='Name', required=True)

@@ -5,6 +5,7 @@ class SymptomAreas(models.Model):
     _name = 'x_symptom_areas'
     _description = 'Symptom Areas'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _rec_name = 'x_name'
     _order = 'x_studio_sequence, id'
 
     x_name = fields.Char(string='Name', required=True)

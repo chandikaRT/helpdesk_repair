@@ -5,6 +5,7 @@ class TaskDiagnosis(models.Model):
     _name = 'x_task_diagnosis'
     _description = 'Task Diagnosis'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _rec_name = 'x_name'
     _order = 'x_studio_sequence, id'
 
     x_name = fields.Char(string='Name', required=True)

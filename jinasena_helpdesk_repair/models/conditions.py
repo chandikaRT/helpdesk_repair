@@ -5,6 +5,7 @@ class Conditions(models.Model):
     _name = 'x_conditions'
     _description = 'Conditions'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _rec_name = 'x_name'
     _order = 'x_studio_sequence, id'
 
     x_name = fields.Char(string='Name', required=True)
