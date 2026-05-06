@@ -205,15 +205,24 @@ async function discardRecord(page) {
 // ---------------------------------------------------------------------------
 
 async function fillChar(page, fieldName, value) {
-  const input = page.locator(`div[name="${fieldName}"] input`).first();
-  // Retry loop: Odoo OWL async re-renders can reset the field immediately
-  // after fill(), especially during the initial form-load render cycle.
-  // Keep filling until the value actually sticks in the DOM.
+  // Scope to .o_form_view to avoid matching hidden kanban quick-create inputs.
+  let input = page.locator(
+    `.o_form_view [name="${fieldName}"] input, .o_form_view input[name="${fieldName}"]`
+  ).first();
+  // Odoo renders the record title (name='name') inside a heading element
+  // without a div[name] wrapper, and may use a contenteditable div (not a
+  // real <input>). Fall back to getByRole('textbox') scoped to the heading.
+  if (fieldName === 'name') {
+    const visible = await input.isVisible({ timeout: 3000 }).catch(() => false);
+    if (!visible) {
+      input = page.getByRole('heading', { level: 1 }).getByRole('textbox').first();
+    }
+  }
+  await input.waitFor({ state: 'visible', timeout: 15000 });
   for (let attempt = 0; attempt < 5; attempt++) {
     await input.fill(value, { timeout: 20000 });
     const actual = await input.inputValue().catch(() => null);
     if (actual === value) return;
-    // Value was reset — wait briefly for the re-render cycle to settle
     await page.locator('.o_form_view').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
   }
 }
@@ -273,20 +282,91 @@ async function fillMany2one(page, fieldName, value) {
 
 async function fillMany2oneCreate(page, fieldName, value) {
   const input = page.locator(`div[name="${fieldName}"] input`).first();
-  await input.waitFor({ state: 'visible' });
+  await input.waitFor({ state: 'visible', timeout: 15000 });
+  const dropdown = page.locator(
+    '.o_autocomplete_dropdown, .o-autocomplete--dropdown-menu'
+  ).first();
   await input.click();
-  await input.fill(value);
-  const dropdown = page.locator('.o_autocomplete_dropdown').first();
-  await dropdown.waitFor({ state: 'visible', timeout: 8000 });
-  // Prefer exact match; if not found try "Create and edit..." or "Create ..."
-  const exactOption = dropdown.locator('.o_menu_item').filter({ hasText: value }).first();
-  const createOption = dropdown.locator('.o_menu_item').filter({ hasText: `Create "${value}"` }).first();
-  if (await exactOption.isVisible({ timeout: 2000 }).catch(() => false)) {
+  await dropdown.waitFor({ state: 'visible', timeout: 10000 });
+  await input.pressSequentially(value, { delay: 80 });
+  // Prefer exact existing match; fall back to "Create 'value'" quick-create option
+  const exactOption = dropdown
+    .locator('.o_menu_item, li, a')
+    .filter({ hasText: value })
+    .filter({ hasNotText: /Create|Search More/ })
+    .first();
+  if (await exactOption.isVisible({ timeout: 3000 }).catch(() => false)) {
     await exactOption.click();
   } else {
-    await createOption.waitFor({ state: 'visible', timeout: 5000 });
+    const createOption = dropdown
+      .locator('.o_menu_item, li, a')
+      .filter({ hasText: new RegExp(`Create.*${value}`, 'i') })
+      .first();
+    await createOption.waitFor({ state: 'visible', timeout: 8000 });
     await createOption.click();
   }
+  await dropdown.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+  await page.waitForTimeout(800);
+}
+
+async function handleCreateDialog(page, fields) {
+  // Target only the foreground (active) technical modal — Odoo stacks them
+  // with o_inactive_modal on any covered one.
+  const modal = page.locator('.o_technical_modal:not(.o_inactive_modal)').first();
+  if (!(await modal.isVisible({ timeout: 2000 }).catch(() => false))) return;
+  for (const [fieldName, preferredValue] of Object.entries(fields)) {
+    const input = modal.locator(`[name="${fieldName}"] input`).first();
+    // Skip if the field is already filled correctly (Odoo may pre-populate from context)
+    const existing = await input.inputValue().catch(() => '');
+    if (existing && existing.includes(preferredValue)) continue;
+
+    const dropdown = page.locator(
+      '.o_autocomplete_dropdown, .o-autocomplete--dropdown-menu'
+    ).first();
+    await input.click();
+    await dropdown.waitFor({ state: 'visible', timeout: 8000 });
+    await input.pressSequentially(preferredValue, { delay: 80 });
+    await page.waitForTimeout(800);
+
+    const exactOpt = dropdown
+      .locator('.o_menu_item, li, a')
+      .filter({ hasText: preferredValue })
+      .filter({ hasNotText: /Create|Search More/ })
+      .first();
+
+    if (await exactOpt.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await exactOpt.click();
+    } else {
+      // Preferred value not found — clear and pick the first available record.
+      await input.press('Control+a');
+      await input.press('Backspace');
+      await page.waitForTimeout(500);
+      const firstOpt = dropdown
+        .locator('.o_menu_item, li, a')
+        .filter({ hasNotText: /Create|Search More/ })
+        .first();
+      if (await firstOpt.isVisible({ timeout: 5000 }).catch(() => false)) {
+        await firstOpt.click();
+      } else {
+        await page.keyboard.press('Escape');
+      }
+    }
+    await dropdown.waitFor({ state: 'hidden', timeout: 8000 }).catch(() => {});
+  }
+  await modal.getByRole('button', { name: 'Save & Close' }).click();
+  await page.waitForTimeout(1000);
+
+  // If a validation error appeared (e.g. duplicate serial), close it and throw.
+  const errModal = page.locator('.o_technical_modal:not(.o_inactive_modal)').filter({ hasText: 'Validation Error' }).first();
+  if (await errModal.isVisible({ timeout: 1500 }).catch(() => false)) {
+    const errText = await errModal.locator('p, .o_error_detail').first().textContent().catch(() => '');
+    await errModal.getByRole('button', { name: 'Close' }).click();
+    await errModal.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+    throw new Error(`handleCreateDialog Validation Error: ${errText.trim()}`);
+  }
+
+  // Wait for the create dialog itself to close
+  await modal.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
 }
 
 async function fillText(page, fieldName, value) {
@@ -517,6 +597,7 @@ module.exports = {
   fillChar,
   fillMany2one,
   fillMany2oneCreate,
+  handleCreateDialog,
   fillText,
   setBoolean,
   getFieldText,

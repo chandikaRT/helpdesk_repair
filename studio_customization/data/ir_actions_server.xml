@@ -2634,7 +2634,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_create_repair_route()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Create Repair Route (stub)</field>
     <field name="state">code</field>
@@ -2643,7 +2643,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_create_repair_serial()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Create Repair Serial (stub)</field>
     <field name="state">code</field>
@@ -2661,7 +2661,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_send_to_factory()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Send to Factory (stub)</field>
     <field name="state">code</field>
@@ -2670,7 +2670,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_receive_at_factory()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Receive at Factory (stub)</field>
     <field name="state">code</field>
@@ -2688,7 +2688,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_receive_at_sales_centre()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Receive at Sales Centre (stub)</field>
     <field name="state">code</field>
@@ -2697,7 +2697,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_send_to_sales_centre()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Send to Sales Centre (stub)</field>
     <field name="state">code</field>
@@ -2760,7 +2760,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_change_type_to_rug()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Change Repair Type To RUG (stub)</field>
     <field name="state">code</field>
@@ -2868,7 +2868,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_cancel_repair()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Cancel Ticket (stub)</field>
     <field name="state">code</field>
@@ -2877,7 +2877,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_reopen_repair()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Reopen Ticket (stub)</field>
     <field name="state">code</field>
@@ -3066,7 +3066,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_cancel_repair_stage10()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Cancel Ticket (2343) (stub)</field>
     <field name="state">code</field>
@@ -3192,7 +3192,7 @@ if work_center:
     <field name="binding_model_id" eval="False"/>
     <field name="binding_type">action</field>
     <field name="child_ids" eval="[(6, 0, [])]"/>
-    <field name="code"></field>
+    <field name="code">record.action_update_serial()</field>
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="name">Update Serial (stub)</field>
     <field name="state">code</field>

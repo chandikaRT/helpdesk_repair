@@ -24,6 +24,8 @@ const {
   saveRecord,
   fillChar,
   fillMany2one,
+  fillMany2oneCreate,
+  handleCreateDialog,
   clickHeaderButton,
   confirmDialog,
   expectHeaderButtonVisible,
@@ -38,23 +40,36 @@ test.describe('01 – RUG Repair Flow', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
     await goToHelpdesk(page);
+    // Helpdesk lands on Overview — navigate to All Tickets so "New" is available
+    const ticketsMenu = page
+      .locator('.o_menu_sections a, .o_menu_sections button')
+      .filter({ hasText: /^Tickets$/ })
+      .first();
+    await ticketsMenu.click();
+    const allTickets = page.locator('.o_dropdown_item, .dropdown-item, .o_nav_entry')
+      .filter({ hasText: /^All Tickets$/ })
+      .first();
+    await allTickets.waitFor({ state: 'visible', timeout: 5000 });
+    await allTickets.click();
+    await page.locator('.o_list_view, .o_kanban_view').first()
+      .waitFor({ state: 'visible', timeout: 15000 });
   });
 
   test('Full RUG repair: NEW → HANDED OVER TO CUSTOMER', async ({ page }) => {
+    const serialNo = `SN-RUG-${Date.now().toString().slice(-8)}`;
     // ------------------------------------------------------------------
     // 1. Create ticket
     // ------------------------------------------------------------------
     await clickNew(page);
+    // Fill name first — avoids any open dropdown blocking the title input
+    await fillChar(page, 'name', 'E2E RUG Repair Test');
     await fillMany2one(page, 'partner_id', 'Azure Interior');
     await fillMany2one(page, 'ticket_type_id', TICKET_TYPE_RUG);
-
-    // Product and serial number
+    // Product before serial number (serial is filtered by product in stock.lot)
     await fillMany2one(page, 'product_id', 'Acoustic Bloc Screens');
-    const serialInput = page.locator('div[name="x_studio_serial_no"] input').first();
-    await serialInput.fill('SN-E2E-RUG-001');
-
-    // Set name/subject
-    await fillChar(page, 'name', 'E2E RUG Repair Test');
+    await fillMany2oneCreate(page, 'x_studio_serial_no', serialNo);
+    // stock.lot requires product_id — a Create dialog appears for new serial numbers
+    await handleCreateDialog(page, { product_id: 'Acoustic Bloc Screens' });
 
     await saveRecord(page);
 
@@ -76,7 +91,7 @@ test.describe('01 – RUG Repair Flow', () => {
     // ------------------------------------------------------------------
     await expectHeaderButtonVisible(page, 'Update Serial');
     await clickHeaderButton(page, 'Update Serial');
-    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
 
     // After update serial, sn_updated becomes True → Update Serial hides
     await expectHeaderButtonHidden(page, 'Update Serial');
@@ -98,10 +113,10 @@ test.describe('01 – RUG Repair Flow', () => {
         await dialog.locator('button.btn-primary').first().click();
       }
     }
-    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
     // Navigate back to the ticket if we left the form
     await page.goBack().catch(() => {});
-    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
 
     // ------------------------------------------------------------------
     // 6. Verify active stage has progressed or is still NEW (button availability)
@@ -120,19 +135,19 @@ test.describe('01 – RUG Repair Flow', () => {
   });
 
   test('RUG ticket: Update Serial button hides after click', async ({ page }) => {
+    const serialNo = `SN-SER-${Date.now().toString().slice(-8)}`;
     await clickNew(page);
+    await fillChar(page, 'name', 'E2E RUG Serial Test');
     await fillMany2one(page, 'partner_id', 'Azure Interior');
     await fillMany2one(page, 'ticket_type_id', TICKET_TYPE_RUG);
     await fillMany2one(page, 'product_id', 'Acoustic Bloc Screens');
-    await fillChar(page, 'name', 'E2E RUG Serial Test');
-
-    const serialInput = page.locator('div[name="x_studio_serial_no"] input').first();
-    await serialInput.fill('SN-E2E-RUG-002');
+    await fillMany2oneCreate(page, 'x_studio_serial_no', serialNo);
+    await handleCreateDialog(page, { product_id: 'Acoustic Bloc Screens' });
     await saveRecord(page);
 
     await expectHeaderButtonVisible(page, 'Update Serial');
     await clickHeaderButton(page, 'Update Serial');
-    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
 
     await expectHeaderButtonHidden(page, 'Update Serial');
   });

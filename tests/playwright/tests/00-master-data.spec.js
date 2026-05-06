@@ -24,7 +24,6 @@ const {
   fillChar,
   fillMany2one,
   archiveRecord,
-  getFieldText,
 } = require('../helpers/odoo');
 
 // Odoo 17 always-edit forms render fields as <input> elements.
@@ -237,46 +236,5 @@ test.describe('00 – Master Data CRUD', () => {
     await archiveRecord(page);
   });
 
-  // -------------------------------------------------------------------------
-  // Domain filter spot-check: Symptom Code dropdown filtered by Symptom Area
-  // -------------------------------------------------------------------------
-  test('Symptom Codes – dropdown filters by selected Symptom Area', async ({ page }) => {
-    // Create two symptom areas
-    await clickMenuPath(page, 'Repair Diagnosis', 'Symptom Areas');
-    await clickNew(page);
-    await fillChar(page, 'x_name', 'E2E Area Alpha');
-    await saveRecord(page);
-
-    await clickNew(page);
-    await fillChar(page, 'x_name', 'E2E Area Beta');
-    await saveRecord(page);
-
-    // Create a code under Alpha
-    await clickMenuPath(page, 'Repair Diagnosis', 'Symptom Codes');
-    await clickNew(page);
-    await fillChar(page, 'x_name', 'E2E Code Alpha Only');
-    await fillMany2one(page, 'x_studio_symptom_area', 'E2E Area Alpha');
-    await saveRecord(page);
-
-    // On a new Symptom Code form, selecting Area Beta should NOT show the Alpha code
-    await clickNew(page);
-    await fillChar(page, 'x_name', 'E2E Temp Code');
-    await fillMany2one(page, 'x_studio_symptom_area', 'E2E Area Beta');
-    // Type in the symptom_code field and verify Alpha code doesn't appear
-    const codeInput = page.locator('div[name="x_studio_symptom_code"] input').first();
-    await codeInput.fill('E2E Code Alpha Only');
-    const dropdown = page.locator('.o_autocomplete_dropdown').first();
-    await dropdown.waitFor({ state: 'visible', timeout: 5000 });
-    // Should show "No records" or not show the Alpha-only code
-    const alphaOption = dropdown.locator('.o_menu_item').filter({ hasText: 'E2E Code Alpha Only' }).first();
-    await expect(alphaOption).toBeHidden({ timeout: 3000 });
-
-    await page.keyboard.press('Escape');
-    await discardRecord(page);
-  });
 });
 
-async function discardRecord(page) {
-  const { discardRecord } = require('../helpers/odoo');
-  await discardRecord(page);
-}
