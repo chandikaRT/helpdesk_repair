@@ -80,6 +80,18 @@ class HelpdeskTicket(models.Model):
     x_studio_reopen_status = fields.Char(string='Reopen Status')
     x_studio_stage_date = fields.Datetime(string='Stage Date')
 
+    # --- Tree view optional columns ---
+    x_studio_materials_used = fields.Char(string='Materials Used')
+    x_studio_quantity = fields.Float(string='Quantity')
+    x_studio_unit_price = fields.Float(string='Unit Price')
+    x_studio_items = fields.Many2many(
+        'product.product',
+        'x_helpdesk_ticket_product_items_rel',
+        'ticket_id', 'product_id',
+        string='Items')
+    x_studio_qty = fields.Float(string='Qty')
+    x_studio_sales_price = fields.Float(string='Sales Price')
+
     # --- Computed boolean fields (stubs — TODO: implement from ir_actions_server.xml) ---
     x_studio_task_status = fields.Boolean(
         compute='_compute_task_status', store=True, readonly=True,
@@ -305,3 +317,26 @@ class HelpdeskTicket(models.Model):
         """
         self.ensure_one()
         self.x_studio_repair_serial_created = True
+
+    def action_create_receipt(self):
+        """Create a receipt (incoming stock picking) for repairs without serial number.
+        Returns an action to view the created picking.
+        """
+        self.ensure_one()
+        picking_type = self.env['stock.picking.type'].search(
+            [('code', '=', 'incoming'), ('company_id', '=', self.company_id.id)], limit=1)
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': picking_type.id,
+            'partner_id': self.partner_id.id,
+            'origin': self.name,
+            'location_id': self.x_studio_return_receipt_location.id or self.env.ref('stock.stock_location_customers').id,
+            'location_dest_id': self.x_studio_virtual_location_id.id or picking_type.default_location_dest_id.id,
+        })
+        self.x_studio_pick_id = picking
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'stock.picking',
+            'res_id': picking.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }

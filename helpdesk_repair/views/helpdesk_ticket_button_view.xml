@@ -33,10 +33,12 @@
                 <field name="fsm_task_count" invisible="1"/>
                 <field name="product_id" invisible="1"/>
                 <field name="use_product_returns" invisible="1"/>
+                <field name="x_studio_pick_id" invisible="1"/>
+                <field name="x_studio_virtual_location_id" invisible="1"/>
             </xpath>
 
             <!-- Button 1: Change Repair Type To RUG -->
-            <xpath expr="//header/button[@name='assign_ticket_to_self']" position="before">
+            <xpath expr="//header/button[@name='action_repair_order_form']" position="before">
                 <button type="object" name="action_change_type_to_rug"
                         string="Change Repair Type To RUG"
                         class="btn-primary"
@@ -52,8 +54,8 @@
                         invisible="((x_studio_sn_updated == True) and (x_studio_rug_repair == True)) or (((x_studio_sn_updated == True) and (x_studio_normal_repair_with_serial_no == True)) or ((x_studio_serial_no == False) or (x_studio_normal_repair_without_serial_no == True)))"/>
             </xpath>
 
-            <!-- Button 4: Receipt (without serial — after assign_ticket_to_self) -->
-            <xpath expr="//header/button[@name='assign_ticket_to_self']" position="after">
+            <!-- Button 4: Receipt (without serial — after Change Repair Type To RUG) -->
+            <xpath expr="//header/button[@name='action_change_type_to_rug']" position="after">
                 <button type="object" name="action_create_receipt"
                         string="Receipt"
                         groups="stock.group_stock_user"
@@ -68,7 +70,7 @@
             </xpath>
 
             <!-- Button 5: Create Repair Route -->
-            <xpath expr="//header/button[@name='%(stock.act_stock_return_picking)d'][3]" position="before">
+            <xpath expr="//header/button[@name='action_generate_fsm_task']" position="before">
                 <button type="object" name="action_create_repair_route"
                         string="Create Repair Route"
                         class="btn-primary"

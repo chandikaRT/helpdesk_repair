@@ -31,9 +31,9 @@ class ProjectTask(models.Model):
         compute='_compute_valid_diagnosis', store=True, readonly=True,
         string='Valid Diagnosis')
     x_studio_diagnosis_area_1 = fields.Many2one(
-        'x_diagnosis_areas', string='Diagnosis Area', invisible=True)
+        'x_diagnosis_areas', string='Diagnosis Area')
     x_studio_reason_code = fields.Many2one(
-        'x_repair_reason', string='Reason Code', invisible=True)
+        'x_repair_reason', string='Reason Code')
 
     # =========================================================================
     # Computed field stubs

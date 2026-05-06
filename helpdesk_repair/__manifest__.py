@@ -1,5 +1,5 @@
 {
-    'name': 'Helpdesk Repair',
+    'name': 'Jinasena Helpdesk Repair',
     'version': '17.0.1.0.0',
     'category': 'Helpdesk',
     'author': 'Jinasena Pvt Ltd',
@@ -17,7 +17,6 @@
     'data': [
         'security/res_groups.xml',
         'security/ir.model.access.csv',
-        'data/helpdesk_stages.xml',
         'views/repair_stages_views.xml',
         'views/repair_reason_views.xml',
         'views/repair_reason_custom_views.xml',

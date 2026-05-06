@@ -13,7 +13,7 @@
             </xpath>
 
             <!-- Move ticket_type_id after user_ids; add location fields -->
-            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='user_ids']"
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='user_id']"
                    position="after">
                 <xpath expr="//field[@name='ticket_type_id']" position="move"/>
                 <field name="x_studio_return_receipt_location"
