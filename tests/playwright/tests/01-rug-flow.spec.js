@@ -76,6 +76,37 @@ test.describe('01 – RUG Repair Flow', () => {
     // ------------------------------------------------------------------
     // 2. Verify proxy boolean fields reflect ticket type
     // ------------------------------------------------------------------
+    // Diagnostic: read record field values via Odoo RPC
+    const recId = await page.evaluate(() => {
+      // Try URL hash style (/web#id=N) and SPA style (/odoo/.../N)
+      const hashId = window.location.hash.match(/[?&]id=(\d+)/)?.[1];
+      if (hashId) return parseInt(hashId);
+      const pathId = window.location.pathname.match(/\/(\d+)(?:\/|$)/)?.[1];
+      if (pathId) return parseInt(pathId);
+      // Fall back: read from breadcrumb "#N"
+      const bc = document.querySelector('.o_breadcrumb .o_last_breadcrumb_item, .o_form_view h1');
+      const m = bc?.textContent?.match(/#(\d+)/);
+      return m ? parseInt(m[1]) : null;
+    });
+    console.log('Record ID from URL/DOM:', recId);
+
+    if (recId) {
+      const rpcResult = await page.evaluate(async (id) => {
+        const r = await fetch('/web/dataset/call_kw/helpdesk.ticket/read', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', id: 1,
+            params: { model: 'helpdesk.ticket', method: 'read',
+              args: [[id]], kwargs: {
+                fields: ['x_studio_rug_repair','x_studio_sn_updated',
+                         'x_studio_rug_confirmed','ticket_type_id','name'],
+                context: {} }}})
+        });
+        return (await r.json()).result;
+      }, recId);
+      console.log('RPC field values after save:', JSON.stringify(rpcResult));
+    }
+
     const rugRepair = await getBooleanValue(page, 'x_studio_rug_repair').catch(() => null);
     const rugConfirmed = await getBooleanValue(page, 'x_studio_rug_confirmed').catch(() => null);
     if (rugRepair !== null) expect(rugRepair).toBe(true);
@@ -91,7 +122,26 @@ test.describe('01 – RUG Repair Flow', () => {
     // ------------------------------------------------------------------
     await expectHeaderButtonVisible(page, 'Update Serial');
     await clickHeaderButton(page, 'Update Serial');
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
+
+    // Diagnostic: read field values via RPC after clicking Update Serial
+    if (recId) {
+      const afterRpc = await page.evaluate(async (id) => {
+        const r = await fetch('/web/dataset/call_kw/helpdesk.ticket/read', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', id: 2,
+            params: { model: 'helpdesk.ticket', method: 'read',
+              args: [[id]], kwargs: {
+                fields: ['x_studio_rug_repair','x_studio_sn_updated','ticket_type_id'],
+                context: {} }}})
+        });
+        const result = (await r.json()).result;
+        result.errorToast = document.querySelector('.o_notification.bg-danger, .o_notification_content')?.textContent?.trim() || null;
+        return result;
+      }, recId);
+      console.log('RPC field values after Update Serial:', JSON.stringify(afterRpc));
+    }
 
     // After update serial, sn_updated becomes True → Update Serial hides
     await expectHeaderButtonHidden(page, 'Update Serial');

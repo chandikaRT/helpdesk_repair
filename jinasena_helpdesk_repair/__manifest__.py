@@ -17,6 +17,7 @@
     'data': [
         'security/res_groups.xml',
         'security/ir.model.access.csv',
+        'data/helpdesk_ticket_types.xml',
         'views/repair_stages_views.xml',
         'views/repair_reason_views.xml',
         'views/repair_reason_custom_views.xml',
