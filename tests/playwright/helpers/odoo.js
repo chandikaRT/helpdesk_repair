@@ -313,7 +313,9 @@ async function handleCreateDialog(page, fields) {
   // Target only the foreground (active) technical modal — Odoo stacks them
   // with o_inactive_modal on any covered one.
   const modal = page.locator('.o_technical_modal:not(.o_inactive_modal)').first();
-  if (!(await modal.isVisible({ timeout: 2000 }).catch(() => false))) return;
+  // Wait up to 5s for the dialog to open — it may take a moment after the "Create" click.
+  await modal.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+  if (!(await modal.isVisible().catch(() => false))) return;
 
   for (const [fieldName, preferredValue] of Object.entries(fields)) {
     // Wait for the field to be rendered before touching it (avoids timing race on dialog open)
