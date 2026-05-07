@@ -11,6 +11,7 @@ from . import conditions
 from . import resolutions
 from . import task_diagnosis
 from . import helpdesk_ticket_type
+from . import helpdesk_team
 from . import helpdesk_ticket
 from . import project_task
 from . import sale_order

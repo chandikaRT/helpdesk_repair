@@ -2,5 +2,6 @@
 <odoo noupdate="0">
 
     <function model="helpdesk.ticket.type" name="_init_ticket_types"/>
+    <function model="helpdesk.team" name="_init_teams"/>
 
 </odoo>

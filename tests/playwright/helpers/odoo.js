@@ -314,12 +314,16 @@ async function handleCreateDialog(page, fields) {
   // with o_inactive_modal on any covered one.
   const modal = page.locator('.o_technical_modal:not(.o_inactive_modal)').first();
   if (!(await modal.isVisible({ timeout: 2000 }).catch(() => false))) return;
+
   for (const [fieldName, preferredValue] of Object.entries(fields)) {
+    // Wait for the field to be rendered before touching it (avoids timing race on dialog open)
+    await modal.locator(`[name="${fieldName}"]`).waitFor({ state: 'visible', timeout: 8000 });
     const input = modal.locator(`[name="${fieldName}"] input`).first();
     // Skip if the field is already filled correctly (Odoo may pre-populate from context)
     const existing = await input.inputValue().catch(() => '');
     if (existing && existing.includes(preferredValue)) continue;
 
+    // Odoo renders autocomplete dropdowns at body level, so page.locator is correct here.
     const dropdown = page.locator(
       '.o_autocomplete_dropdown, .o-autocomplete--dropdown-menu'
     ).first();
@@ -353,6 +357,7 @@ async function handleCreateDialog(page, fields) {
     }
     await dropdown.waitFor({ state: 'hidden', timeout: 8000 }).catch(() => {});
   }
+
   await modal.getByRole('button', { name: 'Save & Close' }).click();
   await page.waitForTimeout(1000);
 
@@ -365,8 +370,11 @@ async function handleCreateDialog(page, fields) {
     throw new Error(`handleCreateDialog Validation Error: ${errText.trim()}`);
   }
 
-  // Wait for the create dialog itself to close
-  await modal.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
+  // If dialog is still open, required fields likely failed inline validation — report and fail.
+  await modal.waitFor({ state: 'hidden', timeout: 12000 }).catch(async () => {
+    const invalidCount = await modal.locator('.o_field_invalid').count();
+    throw new Error(`handleCreateDialog: dialog did not close after Save & Close (${invalidCount} invalid fields)`);
+  });
 }
 
 async function fillText(page, fieldName, value) {
